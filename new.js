@@ -6,22 +6,21 @@ let zoomed_cam = 0;
 let p = 0;
 let open = 0;
 let do_closing = 0;
+let muted = 0;
 /////////////////////////////////
 
+ 
 
-
-// ------------ Music Play --------- //
+// ------------ Music Init --------- //
 
 var music = new Audio();
 music.src = "azure.mp3";
-music.play();
 music.volume = 0;
 music.loop = true;
-var hide = false;
 
 //////////////////////////////////////
 
-
+ 
 
 
 // **************************************** //
@@ -124,7 +123,7 @@ loader2.load('./cyberpunk_car/scene.gltf', function (gltf) {
 
 const renderTarget = new THREE.WebGLRenderTarget(1000, 570);
 const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera(60, 1, 0.1, 10000);
+const camera = new THREE.PerspectiveCamera(65, 1, 0.1, 10000);
 camera.position.y = 2;
 camera.position.z = 3;
 camera.position.x = -3.5;
@@ -146,7 +145,7 @@ const tvmaterial = new THREE.MeshPhongMaterial({
     map: renderTarget.texture,
 });
 const tvlane = new THREE.Mesh(tv, tvmaterial);
-tvlane.position.set(-0.08, 2.2, -13.5809);
+tvlane.position.set(-0.09, 2.14, -13.5809);
 scene.add(tvlane);
 
 ///////////////////////////////////////////////////////////
@@ -155,12 +154,12 @@ scene.add(tvlane);
 
 // ------------- Channel 1 Init - Open TV Button  -------------------------//
 
-const ch1_geometry = new THREE.CircleGeometry(0.058, 32);
+const ch1_geometry = new THREE.CircleGeometry(0.068, 32);
 const ch1_material = new THREE.MeshLambertMaterial({ color: 0xffff00 });
 const circle = new THREE.Mesh(ch1_geometry, ch1_material);
 circle.position.set(
     camera.position.x - 0.34,
-    camera.position.y - 0.42,
+    camera.position.y - 0.43,
     camera.position.z - 0.96
 );
 
@@ -168,9 +167,9 @@ scene.add(circle);
 
 ///////////////////////////////////////////////////////////////
 
-// ------------------- Closed TV Geo - Close TV Button ----------------- //
+// ------------------- Close TV Geo - Close TV Button ----------------- //
 
-const close_geo = new THREE.CircleGeometry(0.32, 32);
+const close_geo = new THREE.CircleGeometry(0.345, 32);
 const close_material = new THREE.MeshLambertMaterial({ color: 0x000000 });
 const close_btn = new THREE.Mesh(close_geo, close_material);
 close_btn.rotation.x = -Math.PI / 2;
@@ -180,7 +179,7 @@ scene.add(close_btn);
 
 ////////////////////////////////////////////////////////////
 
-// ----------------- Close TV button - Texture ---------------- //
+// ----------------- Closed TV Black - Texture ---------------- //
 const tvC = new THREE.PlaneGeometry(10.7, 6.2);
 const tvCmaterial = new THREE.MeshLambertMaterial({
     color: 0x000000
@@ -188,7 +187,7 @@ const tvCmaterial = new THREE.MeshLambertMaterial({
 const tvClane = new THREE.Mesh(tvC, tvCmaterial);
 tvClane.castShadow = true;
 tvClane.receiveShadow = true;
-tvClane.position.set(-0.08, 2.2, -13.4809);
+tvClane.position.set(-0.09, 2.14, -13.4809);
 scene.add(tvClane);
 
 
@@ -196,19 +195,19 @@ scene.add(tvClane);
 
 // ------------- Lights Init in Room scene ---------------//
 
-const light = new THREE.PointLight(0xC41717, 4.5, 7, 2);
+const light = new THREE.PointLight(0xC41717, 5.5, 7, 2);
 light.position.set(8, 3, -11);
 scene.add(light);
 
-const light1 = new THREE.PointLight(0x118C1C, 4.5, 7, 2);
+const light1 = new THREE.PointLight(0x118C1C, 5.5, 7, 2);
 light1.position.set(-8, 3, -11);
 scene.add(light1);
 
-const light2 = new THREE.PointLight(0x87103F, 4.5, 13, 2);
+const light2 = new THREE.PointLight(0x87103F, 5.5, 13, 2);
 light2.position.set(-8, 3, -4);
 scene.add(light2);
 
-const light3 = new THREE.PointLight(0x0E2985, 4.5, 13, 2);
+const light3 = new THREE.PointLight(0x0E2985, 5.5, 13, 2);
 light3.position.set(8, 3, -4);
 scene.add(light3);
 
@@ -308,6 +307,11 @@ loader_stop.load("./red_button/scene.gltf", function (gltf) {
 
 const domEvents = new THREEx.DomEvents(camera, renderer.domElement)
 domEvents.addEventListener(circle, 'click', event => {
+    if(muted == 0){
+        music.play();
+        muted = 1;
+    }
+
     if (zoomed_cam != 1) {
         open = 1;
         zoomed_cam = 1;
@@ -327,20 +331,6 @@ domEvents1.addEventListener(close_btn, 'click', event => {
 });
 
 ///////////////////////////////////////////////////////////////
-
-
-// *********** Disable/Enable Sound via SoundControl ******* //
-circle.addEventListener("click", function () {
-    if (hide) {
-        music.volume = 0.6;
-    } else {
-        music.volume = 0;
-    }
-    hide = !hide;
-}, false);
-
-///////////////////////////////////////////////////////////
-
 
 
 
@@ -372,7 +362,6 @@ function render() {
     ///////////////////////////////////////////////////////////////////////////
 
 
-
     // -------------- Animate Shaders and call Resize -------------------- ///
 
     if (resize(renderer)) {
@@ -386,6 +375,8 @@ function render() {
 
     ////////////////////////////////////////////////////////////////////////////
 
+    
+    
 
     //-------------- Zoom to the TV and Play Music From Event Handler ------------//
     if (zoomed_cam == 1) {
@@ -496,7 +487,7 @@ function resize(renderer) {
 
 
 
-// ----- initialize Clock and Run Render ----- //
+// ----- initialize Clock and Run Renderer ----- //
 
 const clock = new THREE.Clock();
 let time = 0;
